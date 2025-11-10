@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동물상을 찾아주는 얼굴 인식 애플리케이션</title>
+</head>
+<body>
+    <h1>동물상을 찾아주는 얼굴 인식 애플리케이션</h1>
+
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="submit">업로드</button>
+    </form>
+
+    {% if qr_image %}
+        <h2>휴대전화로 QR 코드를 스캔해 주세요</h2>
+        <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code">
+    {% endif %}
+
+    {% if face_image %}
+        <h2>감지된 얼굴</h2>
+        <img src="{{ face_image }}" alt="Detected Face" width="400">
+
+        {% if prediction_results %}
+            <h2>예측 결과</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>동물</th>
+                        <th>확률</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for result in prediction_results %}
+                        <tr>
+                            <td>{{ result.animal }}</td>
+                            <td>{{ result.probability | round(2) }}%</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% set top_result = prediction_results | max(attribute='probability') %}
+            <h2 class="highlight">당신은 {{ top_result.animal }}상입니다</h2>
+        {% else %}
+            <p>예측 결과가 없습니다.</p>
+
+        {% endif %}
+    {% endif %}
+</body>
+</html>
